@@ -1,5 +1,6 @@
 import sys
 import pygame
+from pyhsics import check_collision
 
 pygame.init()
 
@@ -10,11 +11,12 @@ pygame.display.set_caption("An ass of a game :(")
 
 clock = pygame.time.Clock()
 
+enemy_rect = pygame.Rect(725, 25, 50, 50)
 player_rect = pygame.Rect(375, 275, 50, 50)
 walls = [
-    pygame.Rect(100, 100, 600, 50),  # Top boundary wall
-    pygame.Rect(500, 200, 100, 200), # Your original obstacle wall
-    pygame.Rect(200, 400, 200, 50)   # A bottom barrier wall
+    pygame.Rect(100, 100, 600, 50),
+    pygame.Rect(500, 200, 100, 200),
+    pygame.Rect(200, 400, 200, 50)
 ]
 
 player_x = float(player_rect.x)
@@ -27,7 +29,9 @@ ACCELERATION = 1.2
 FRICTION = 0.75
 MAX_SPEED = 8.0
 
-while True:
+
+running = True
+while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
@@ -58,33 +62,13 @@ while True:
     if vel_y > MAX_SPEED:  vel_y = MAX_SPEED
     if vel_y < -MAX_SPEED: vel_y = -MAX_SPEED
 
-    player_x += vel_x
-    player_rect.x = int(player_x)
-
-    for wall in walls:
-        if player_rect.colliderect(wall):
-            if vel_x > 0:
-                player_rect.right = wall.left
-            if vel_x < 0:
-                player_rect.left = wall.right
-            player_x = float(player_rect.x)
-            vel_x = 0
-
-    player_y += vel_y
-    player_rect.y = int(player_y)
-
-    for wall in walls:
-        if player_rect.colliderect(wall):
-            if vel_y > 0:
-                player_rect.bottom = wall.top
-            if vel_y < 0:
-                player_rect.top = wall.bottom
-            player_y = float(player_rect.y)
-            vel_y = 0
+    player_x, player_y, vel_x, vel_y = check_collision(player_rect, player_x, player_y, vel_x, vel_y, walls)
 
     screen.fill((40, 40, 40))
 
+    pygame.draw.rect(screen, (255, 255, 255), enemy_rect)
     pygame.draw.rect(screen, (46, 204, 113), player_rect)
+    pygame.draw.line(screen, (255, 0, 0), (enemy_rect.centerx, enemy_rect.centery), (player_rect.centerx, player_rect.centery), 10)
 
     for wall in walls:
         pygame.draw.rect(screen, (231, 76, 60), wall)
