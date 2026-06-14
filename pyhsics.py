@@ -1,29 +1,27 @@
 import pygame
 
 
-def check_collision(player_rect, player_x, player_y, vel_x, vel_y, walls):
-    player_x += vel_x
-    player_rect.x = int(player_x)
+def update_player_physics(player, walls):
+    player.pos.x += player.vel.x
+
+    player.rect.x = int(player.pos.x)
 
     for wall in walls:
-        if player_rect.colliderect(wall):
-            if vel_x > 0:
-                player_rect.right = wall.left
-            if vel_x < 0:
-                player_rect.left = wall.right
-            player_x = float(player_rect.x)
-            vel_x = 0
-
-    player_y += vel_y
-    player_rect.y = int(player_y)
-
-    for wall in walls:
-        if player_rect.colliderect(wall):
-            if vel_y > 0:
-                player_rect.bottom = wall.top
-            if vel_y < 0:
-                player_rect.top = wall.bottom
-            player_y = float(player_rect.y)
-            vel_y = 0
+        if player.rect.colliderect(wall):
+            if player.vel.x > 0:
+                player.rect.right = wall.left
+            elif player.vel.x < 0:
+                player.rect.left = wall.right
+            player.pos.x = player.rect.x
     
-    return player_x, player_y, vel_x, vel_y
+    player.pos.y += player.vel.y
+    
+    player.rect.y = int(player.pos.y)
+
+    for wall in walls:
+        if player.rect.colliderect(wall):
+            if player.vel.y > 0:
+                player.rect.bottom = wall.top
+            if player.vel.y < 0:
+                player.rect.top = wall.bottom
+            player.pos.y = player.rect.y
