@@ -1,23 +1,27 @@
 import sys
 import pygame
-from pyhsics import update_player_physics
+import pyhsics
 from player import Player
-import map
+from enemy import Enemy
+import rooms
 
 pygame.init()
 clock = pygame.time.Clock()
 
-TILE_SIZE = 32
 GRID_WIDTH = 30
 GRID_HEIGHT = 17
-WINDOW_WIDTH = GRID_WIDTH * TILE_SIZE   # 960
-WINDOW_HEIGHT = GRID_HEIGHT * TILE_SIZE # 544
+WINDOW_WIDTH = GRID_WIDTH * rooms.TILE_SIZE   # 960
+WINDOW_HEIGHT = GRID_HEIGHT * rooms.TILE_SIZE # 544
 
 screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
 pygame.display.set_caption("An ass of a game :(")
 
-walls = map.load_map()
-player = Player(100, 100)
+rooms.load_room_from_json()
+rooms.current_room_id = "room_03"
+walls = rooms.load_room()
+
+enemy = Enemy(384, 352)
+player = Player(50, 50)
 game_running = True
 
 while game_running:
@@ -28,7 +32,9 @@ while game_running:
     player.handle_input()
 
     # ---- UPDATE PHASE ----
-    update_player_physics(player, walls)
+    enemy.handle_movement(player)
+    pyhsics.update_entity_physics(player, walls)
+    pyhsics.update_entity_physics(enemy, walls)
 
     # ---- RENDERING PHASE ----
     screen.fill((40, 40, 40))
@@ -36,6 +42,7 @@ while game_running:
     for wall in walls:
         pygame.draw.rect(screen, (231, 76, 60), wall)
 
+    pygame.draw.rect(screen, (255, 0, 0), enemy.rect)
     pygame.draw.rect(screen, (0, 255, 0), player.rect)
 
     pygame.display.flip()

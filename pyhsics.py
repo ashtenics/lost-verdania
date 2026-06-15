@@ -1,27 +1,27 @@
 import pygame
 
-
-def update_player_physics(player, walls):
-    player.pos.x += player.vel.x
-
-    player.rect.x = int(player.pos.x)
-
-    for wall in walls:
-        if player.rect.colliderect(wall):
-            if player.vel.x > 0:
-                player.rect.right = wall.left
-            elif player.vel.x < 0:
-                player.rect.left = wall.right
-            player.pos.x = player.rect.x
+def update_entity_physics(entity, walls):
+    entity.pos.x += entity.vel.x
+    entity.rect.x = round(entity.pos.x)
     
-    player.pos.y += player.vel.y
-    
-    player.rect.y = int(player.pos.y)
-
     for wall in walls:
-        if player.rect.colliderect(wall):
-            if player.vel.y > 0:
-                player.rect.bottom = wall.top
-            if player.vel.y < 0:
-                player.rect.top = wall.bottom
-            player.pos.y = player.rect.y
+        if entity.rect.colliderect(wall):
+            if entity.vel.x > 0:
+                entity.rect.right = wall.left
+            elif entity.vel.x < 0:
+                entity.rect.left = wall.right
+            entity.pos.x = entity.rect.x
+            entity.vel.x = 0
+
+    entity.pos.y += entity.vel.y
+    entity.rect.y = round(entity.pos.y)
+    
+    for wall in walls:
+        if entity.rect.colliderect(wall):
+            if entity.vel.y > 0:
+                entity.rect.bottom = wall.top
+            elif entity.vel.y < 0:
+                entity.rect.top = wall.bottom
+
+            entity.pos.y = entity.rect.y
+            entity.vel.y = 0
