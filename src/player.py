@@ -31,6 +31,6 @@ class Player:
 
         if self.vel.magnitude() < 0.1:
             self.vel = pygame.Vector2(0, 0)
-    
+
     def standing_tile(self):
         return (self.rect.centerx // 32, self.rect.centery // 32)

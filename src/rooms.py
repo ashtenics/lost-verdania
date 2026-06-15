@@ -1,13 +1,14 @@
 import pygame
 import json
 
+
 TILE_SIZE = 32
 
 _MAP_DATA = {}
 current_room_id = "room_01"
 
 
-def load_room_from_json(filepath="rooms.json"):
+def load_room_from_json(filepath="data/rooms.json"):
     global _MAP_DATA
     with open(filepath, "r") as file:
         data = json.load(file)

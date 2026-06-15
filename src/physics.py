@@ -3,7 +3,7 @@ import pygame
 def update_entity_physics(entity, walls):
     entity.pos.x += entity.vel.x
     entity.rect.x = round(entity.pos.x)
-    
+
     for wall in walls:
         if entity.rect.colliderect(wall):
             if entity.vel.x > 0:
@@ -15,7 +15,7 @@ def update_entity_physics(entity, walls):
 
     entity.pos.y += entity.vel.y
     entity.rect.y = round(entity.pos.y)
-    
+
     for wall in walls:
         if entity.rect.colliderect(wall):
             if entity.vel.y > 0:

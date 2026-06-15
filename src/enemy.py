@@ -1,6 +1,6 @@
 import pygame
-import pathfinding
-import rooms
+from . import pathfinding
+from . import rooms
 
 
 class Enemy:
@@ -13,15 +13,26 @@ class Enemy:
         self.acceleration = 0.4
         self.friction = 0.85
 
+        self.path_timer = 0
+        self.path = []
+
     def handle_movement(self, player):
         enemy_tile = self.standing_tile()
         player_tile = player.standing_tile()
 
-        current_matrix = rooms.get_grid_matrix()
-        path = pathfinding.find_path(enemy_tile, player_tile, current_matrix)
+        self.path_timer += 1
 
-        if len(path) > 1:
-            next_tile = path[1]
+        if self.path_timer % 12 == 0:
+            current_matrix = rooms.get_grid_matrix()
+            new_path = pathfinding.find_path(enemy_tile, player_tile, current_matrix)
+
+            if new_path:
+                self.path = new_path
+            else:
+                self.path = []
+
+        if len(self.path) > 1:
+            next_tile = self.path[1]
 
             target_x = (next_tile[0] * rooms.TILE_SIZE) + 16
             target_y = (next_tile[1] * rooms.TILE_SIZE) + 16
@@ -36,8 +47,22 @@ class Enemy:
 
         self.vel *= self.friction
 
+
         if self.vel.length() > self.max_speed:
             self.vel = self.vel.normalize() * self.max_speed
 
     def standing_tile(self):
         return (int(self.rect.centerx // rooms.TILE_SIZE), int(self.rect.centery // rooms.TILE_SIZE))
+
+def spawn_in_enemies():
+    enemies_active = []
+    spawn_locations = rooms.get_enemy_spawns()
+    for coords in spawn_locations:
+
+        px = coords[0] * rooms.TILE_SIZE
+        py = coords[1] * rooms.TILE_SIZE
+
+        enemy = Enemy(px, py)
+        enemies_active.append(enemy)
+
+    return enemies_active
