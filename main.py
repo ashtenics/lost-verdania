@@ -18,7 +18,9 @@ rooms.current_room_id = "room_01"
 walls = rooms.load_room()
 
 enemies = enemy.spawn_in_enemies()
-player = player.Player(50, 50)
+hero = player.Player(50, 50)
+all_entities = [hero]
+all_entities.extend(enemies)
 
 pygame.display.set_caption("An ass of a game :(")
 screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
@@ -32,13 +34,19 @@ while game_running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             game_running = False
-    player.handle_input()
+    hero.handle_input()
 
     # ---- UPDATE PHASE ----
+
+    occupied_tiles = enemy.track_enemy_pos(enemies)
+
     for e in enemies:
-        e.handle_movement(player)
-        physics.update_entity_physics(e, walls)
-    physics.update_entity_physics(player, walls)
+        e.handle_movement(hero)
+
+    physics.update_entity_physics(hero, walls, all_entities, hero)
+
+    for e in enemies:
+        physics.update_entity_physics(e, walls, all_entities, hero)
 
     # ---- RENDERING PHASE ----
     screen.fill((40, 40, 40))
@@ -46,7 +54,7 @@ while game_running:
 
     for e in enemies:
         pygame.draw.rect(screen, (255, 0, 0), e.rect)
-    pygame.draw.rect(screen, (0, 255, 0), player.rect)
+    pygame.draw.rect(screen, (0, 255, 0), hero.rect)
 
     pygame.display.flip()
     clock.tick(60)

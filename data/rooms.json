@@ -20,7 +20,7 @@
                 "W............................W",
                 "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWW"
             ],
-            "enemy_spawns": [[2, 14], [27, 2]]
+            "enemy_spawns": [[2, 14]]
         },
         "room_02": {
             "layout": [
