@@ -14,7 +14,7 @@ WINDOW_WIDTH = GRID_WIDTH * rooms.TILE_SIZE   # 960
 WINDOW_HEIGHT = GRID_HEIGHT * rooms.TILE_SIZE # 544
 
 rooms.load_room_from_json()
-rooms.current_room_id = "room_01"
+rooms.current_room_id = "room_02"
 walls = rooms.load_room()
 
 enemies = enemy.spawn_in_enemies()
@@ -41,12 +41,19 @@ while game_running:
     occupied_tiles = enemy.track_enemy_pos(enemies)
 
     for e in enemies:
-        e.handle_movement(hero)
+        if not e.rect.colliderect(hero.rect):
+            e.handle_movement(hero, "active")
+        else:
+            e.handle_movement(hero, "ragdoll")
 
-    physics.update_entity_physics(hero, walls, all_entities, hero)
+    for entity in all_entities:
+        physics.update_position_x(entity)
+        physics.handle_entity_collisions_x(entity, all_entities, hero)
+        physics.check_wall_collisions_x(entity, walls)
 
-    for e in enemies:
-        physics.update_entity_physics(e, walls, all_entities, hero)
+        physics.update_position_y(entity)
+        physics.handle_entity_collisions_y(entity, all_entities, hero)
+        physics.check_wall_collisions_y(entity, walls)
 
     # ---- RENDERING PHASE ----
     screen.fill((40, 40, 40))

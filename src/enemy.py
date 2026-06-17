@@ -8,68 +8,69 @@ class Enemy:
     def __init__(self, x, y):
         self.pos = pygame.Vector2(x, y)
         self.vel = pygame.Vector2(0, 0)
-        self.knockback = pygame.Vector2(0, 0)
         self.rect = pygame.Rect(x, y, 32, 32)
 
         self.max_speed = 3
         self.acceleration = 0.4
         self.friction = 0.85
-        self.kb_friction = 0.7
 
         self.path_timer = 0
         self.path = []
-        self.is_pushed = False
 
-    def handle_movement(self, player):
+    def handle_movement(self, player, state):
 
-        if self.is_pushed:
-            return
+        if state == "active":
 
-        enemy_tile = self.standing_tile()
-        player_tile = player.standing_tile()
-        self.path_timer += 1
+            self.reset_movement()
 
-        touching_player = self.rect.inflate(2, 2).colliderect(player.rect)
+            enemy_tile = self.standing_tile()
+            player_tile = player.standing_tile()
+            self.path_timer += 1
 
-        if touching_player:
-            self.path = []
-            self.path_timer = 11
+            touching_player = self.rect.inflate(2, 2).colliderect(player.rect)
 
-        else:
-            if self.path_timer % 12 == 0:
-                current_matrix = rooms.get_grid_matrix()
-                new_path = pathfinding.find_path(enemy_tile, player_tile, current_matrix)
-                if new_path:
-                    self.path = new_path
-                else:
-                    self.path = []
+            if touching_player:
+                self.path = []
+                self.path_timer = 11
 
-        if len(self.path) > 1:
-            next_tile = self.path[1]
-            HALF_TILE = int(rooms.TILE_SIZE / 2)
+            else:
+                if self.path_timer % 12 == 0:
+                    current_matrix = rooms.get_grid_matrix()
+                    new_path = pathfinding.find_path(enemy_tile, player_tile, current_matrix)
+                    if new_path:
+                        self.path = new_path
+                    else:
+                        self.path = []
 
-            target_x = (next_tile[0] * rooms.TILE_SIZE) + HALF_TILE
-            target_y = (next_tile[1] * rooms.TILE_SIZE) + HALF_TILE
+            if len(self.path) > 1:
+                next_tile = self.path[1]
+                HALF_TILE = int(rooms.TILE_SIZE / 2)
 
-            dx = target_x - self.rect.centerx
-            dy = target_y - self.rect.centery
-            dir_vector = pygame.Vector2(dx, dy)
+                target_x = (next_tile[0] * rooms.TILE_SIZE) + HALF_TILE
+                target_y = (next_tile[1] * rooms.TILE_SIZE) + HALF_TILE
 
-            if dir_vector.length() > 4:
-                dir_vector = dir_vector.normalize()
-                self.vel += dir_vector * self.acceleration
+                dx = target_x - self.rect.centerx
+                dy = target_y - self.rect.centery
+                dir_vector = pygame.Vector2(dx, dy)
 
-        self.vel *= self.friction
-        if self.vel.length() > self.max_speed:
-            self.vel = self.vel.normalize() * self.max_speed
-        
-        self.knockback *= self.kb_friction
-        if self.knockback.length() < 0.1:
-            self.knockback = pygame.Vector2(0, 0)
+                if dir_vector.length() > 4:
+                    dir_vector = dir_vector.normalize()
+                    self.vel += dir_vector * self.acceleration
+
+            self.vel *= self.friction
+            if self.vel.length() > self.max_speed:
+                self.vel = self.vel.normalize() * self.max_speed
+            
+            elif state == "ragdoll":
+                return
 
     def standing_tile(self):
         return (int(self.rect.centerx // rooms.TILE_SIZE), int(self.rect.centery // rooms.TILE_SIZE))
 
+    def reset_movement(self):
+        self.max_speed = 3
+        self.acceleration = 0.4
+        self.friction = 0.85
 
 def spawn_in_enemies():
     enemies_active = []
